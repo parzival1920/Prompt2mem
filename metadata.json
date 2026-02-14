@@ -1,0 +1,5 @@
+{
+  "name": "Prompt2Meme",
+  "description": "A modern AI-powered meme generator that turns your thoughts into viral-ready memes instantly using Gemini models.",
+  "requestFramePermissions": []
+}

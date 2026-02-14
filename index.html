@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prompt2Meme - Minimalist AI Meme Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg-main: #F9FAFB;
+        --accent: #000000;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-main);
+        color: #111827;
+        margin: 0;
+        overflow-x: hidden;
+      }
+      .font-outfit {
+        font-family: 'Outfit', sans-serif;
+      }
+      @font-face {
+        font-family: 'ImpactMeme';
+        src: local('Impact'), local('Arial Black');
+      }
+      .meme-text {
+        font-family: 'ImpactMeme', 'Impact', 'Arial Black', sans-serif;
+        -webkit-text-stroke: 1.5px black;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      }
+      ::selection {
+        background: #000000;
+        color: #ffffff;
+      }
+      /* Smooth scrolling and transitions */
+      html {
+        scroll-behavior: smooth;
+      }
+      .transition-all {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.40.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
