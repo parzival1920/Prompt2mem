@@ -2,10 +2,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { MemeStyle, GeminiMemeConfig } from "../types";
 
+// Helper to ensure we have an AI instance with current key
+const getAI = () => {
+  const apiKey = process.env.API_KEY || '';
+  return new GoogleGenAI({ apiKey });
+};
+
 export const generateMemeConfig = async (userPrompt: string, style: MemeStyle): Promise<GeminiMemeConfig> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  const ai = getAI();
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-2.0-flash-exp', // Using stable flash for generation
     contents: `The user wants to create a meme. 
     Topic: "${userPrompt}"
     Style: ${style}
@@ -39,9 +45,9 @@ export const generateMemeConfig = async (userPrompt: string, style: MemeStyle): 
 };
 
 export const generateMemeImage = async (imagePrompt: string): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  const ai = getAI();
   
-  // Using gemini-2.5-flash-image for standard image generation
+  // Using gemini-2.5-flash-image for efficient high-quality generation
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
     contents: {
@@ -58,8 +64,11 @@ export const generateMemeImage = async (imagePrompt: string): Promise<string> =>
     },
   });
 
-  // Iterate through parts to find the image data
-  for (const part of response.candidates[0].content.parts) {
+  // Extract the image data from the parts
+  const candidate = response.candidates?.[0];
+  if (!candidate) throw new Error("No response from image model");
+
+  for (const part of candidate.content.parts) {
     if (part.inlineData) {
       const base64EncodeString: string = part.inlineData.data;
       return `data:image/png;base64,${base64EncodeString}`;
