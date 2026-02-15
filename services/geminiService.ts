@@ -2,16 +2,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { MemeStyle, GeminiMemeConfig } from "../types";
 
-// Helper to ensure we have an AI instance with current key
-const getAI = () => {
-  const apiKey = process.env.API_KEY || '';
-  return new GoogleGenAI({ apiKey });
-};
-
 export const generateMemeConfig = async (userPrompt: string, style: MemeStyle): Promise<GeminiMemeConfig> => {
-  const ai = getAI();
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash-exp', // Using stable flash for generation
+    model: 'gemini-3-flash-preview',
     contents: `The user wants to create a meme. 
     Topic: "${userPrompt}"
     Style: ${style}
@@ -45,9 +39,8 @@ export const generateMemeConfig = async (userPrompt: string, style: MemeStyle): 
 };
 
 export const generateMemeImage = async (imagePrompt: string): Promise<string> => {
-  const ai = getAI();
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  // Using gemini-2.5-flash-image for efficient high-quality generation
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
     contents: {
@@ -64,7 +57,6 @@ export const generateMemeImage = async (imagePrompt: string): Promise<string> =>
     },
   });
 
-  // Extract the image data from the parts
   const candidate = response.candidates?.[0];
   if (!candidate) throw new Error("No response from image model");
 
