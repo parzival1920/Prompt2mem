@@ -58,7 +58,7 @@ export const generateMemeImage = async (imagePrompt: string): Promise<string> =>
   });
 
   const candidate = response.candidates?.[0];
-  if (!candidate) throw new Error("No response from image model");
+  if (!candidate) throw new Error("No response from image model. Please check your API configuration.");
 
   for (const part of candidate.content.parts) {
     if (part.inlineData) {

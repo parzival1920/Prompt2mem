@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Download, Share2, RotateCcw } from 'lucide-react';
+import { Download, RotateCcw } from 'lucide-react';
 import { MemeData } from '../types';
 
 interface MemeCardProps {
@@ -101,13 +101,6 @@ const MemeCard: React.FC<MemeCardProps> = ({ meme, onRegenerate }) => {
               title="Regenerate"
             >
               <RotateCcw className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => navigator.clipboard.writeText(meme.caption)}
-              className="p-3 bg-gray-50 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all"
-              title="Copy Caption"
-            >
-              <Share2 className="w-5 h-5" />
             </button>
             <button
               onClick={downloadMeme}

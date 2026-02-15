@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Layout, Info, AlertCircle, Sparkles, CheckCircle2, ArrowRight, RotateCcw, Lightbulb } from 'lucide-react';
+import { Layout, AlertCircle, ArrowRight, RotateCcw, Lightbulb } from 'lucide-react';
 import { MemeStyle, MemeData } from './types';
-import { APP_NAME, TAGLINE, STYLE_CONFIG, PLACEHOLDERS } from './constants';
+import { APP_NAME, STYLE_CONFIG, PLACEHOLDERS } from './constants';
 import { generateMemeConfig, generateMemeImage } from './services/geminiService';
 import LoadingSpinner from './components/LoadingSpinner';
 import MemeCard from './components/MemeCard';
@@ -32,6 +32,10 @@ const App: React.FC = () => {
     setMemeData(null);
 
     try {
+      if (!process.env.API_KEY) {
+        throw new Error("API Key is missing. Please ensure your environment is correctly configured.");
+      }
+      
       const config = await generateMemeConfig(prompt, selectedStyle);
       const imageUrl = await generateMemeImage(config.imagePrompt);
       
@@ -75,7 +79,7 @@ const App: React.FC = () => {
           <span className="text-xl font-bold tracking-tight">{APP_NAME}</span>
         </div>
         <div className="hidden md:flex items-center gap-6">
-          <span className="text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full uppercase tracking-widest">v2.1 Stable</span>
+          <span className="text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full uppercase tracking-widest">v2.2 Stable</span>
         </div>
       </nav>
 
@@ -104,7 +108,10 @@ const App: React.FC = () => {
           {error && (
             <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 animate-in slide-in-from-top-2 duration-300">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <p className="text-sm font-medium">{error}</p>
+              <div className="flex flex-col">
+                <p className="text-sm font-bold">Error Encountered</p>
+                <p className="text-xs">{error}</p>
+              </div>
             </div>
           )}
 
@@ -127,7 +134,7 @@ const App: React.FC = () => {
                 <button
                   key={idx}
                   onClick={() => applySuggestion(s)}
-                  className="text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-full hover:border-black hover:bg-gray-50 transition-all text-gray-600 font-medium"
+                  className="text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-full hover:border-black hover:bg-gray-50 transition-all text-gray-600 font-medium shadow-sm"
                 >
                   {s.length > 30 ? s.slice(0, 30) + '...' : s}
                 </button>
@@ -171,7 +178,7 @@ const App: React.FC = () => {
                 className={`p-2.5 rounded-full transition-all flex items-center justify-center ${
                   isGenerating || !prompt.trim()
                   ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
-                  : 'bg-black text-white hover:scale-105 active:scale-95'
+                  : 'bg-black text-white hover:scale-105 active:scale-95 shadow-md'
                 }`}
               >
                 {isGenerating ? (
@@ -198,7 +205,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="py-6 text-gray-300 text-[10px] font-bold uppercase tracking-[0.3em]">
-        Gemini Flash &bull; {new Date().getFullYear()}
+        Gemini Powered &bull; {new Date().getFullYear()}
       </footer>
     </div>
   );
