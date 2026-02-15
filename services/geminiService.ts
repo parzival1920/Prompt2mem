@@ -2,19 +2,27 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { MemeStyle, GeminiMemeConfig } from "../types";
 
+/**
+ * Service layer acting as our secure backend logic.
+ * The API_KEY is securely injected by the platform environment.
+ */
+
 export const generateMemeConfig = async (userPrompt: string, style: MemeStyle): Promise<GeminiMemeConfig> => {
+  if (!process.env.API_KEY) {
+    throw new Error("Missing API Configuration. Please verify environment settings.");
+  }
+
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `The user wants to create a meme. 
-    Topic: "${userPrompt}"
-    Style: ${style}
+    contents: `You are a viral meme architect. Generate a meme concept for the following topic: "${userPrompt}". 
+    The tone must be: ${style}.
     
-    Generate two things:
-    1. A refined image prompt for an AI image generator. The image should be a "meme template" style (high quality, expressive, funny, but WITHOUT text).
-    2. A witty, short, punchy meme caption (max 15 words).
+    Instructions:
+    1. Create a "Template Description": A vivid, cinematic visual scene WITHOUT any text in the image. Focus on expressions, irony, or dramatic lighting.
+    2. Create a "Punchline": A short, impactful caption that perfectly complements the visual.
     
-    The response should be strictly valid JSON.`,
+    Response MUST be valid JSON.`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -22,11 +30,11 @@ export const generateMemeConfig = async (userPrompt: string, style: MemeStyle): 
         properties: {
           caption: {
             type: Type.STRING,
-            description: "The humorous caption to overlay on the meme.",
+            description: "The witty meme text overlay.",
           },
           imagePrompt: {
             type: Type.STRING,
-            description: "The visual description for generating the meme template.",
+            description: "Vivid description for generating the meme template image.",
           },
         },
         required: ["caption", "imagePrompt"],
@@ -34,8 +42,15 @@ export const generateMemeConfig = async (userPrompt: string, style: MemeStyle): 
     },
   });
 
-  const config = JSON.parse(response.text);
-  return config;
+  const text = response.text;
+  if (!text) throw new Error("Received an empty response from the AI model.");
+  
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("JSON Parse Error:", text);
+    throw new Error("Failed to parse meme configuration. Please try again.");
+  }
 };
 
 export const generateMemeImage = async (imagePrompt: string): Promise<string> => {
@@ -46,7 +61,7 @@ export const generateMemeImage = async (imagePrompt: string): Promise<string> =>
     contents: {
       parts: [
         {
-          text: `A high-quality, expressive meme template without any text. Highly detailed and cinematic. Subject: ${imagePrompt}`,
+          text: `A professional meme template, expressive, cinematic lighting, high-quality, NO TEXT in image: ${imagePrompt}`,
         },
       ],
     },
@@ -58,7 +73,7 @@ export const generateMemeImage = async (imagePrompt: string): Promise<string> =>
   });
 
   const candidate = response.candidates?.[0];
-  if (!candidate) throw new Error("No response from image model. Your API key might not have image generation permissions.");
+  if (!candidate) throw new Error("Visual engine failed to produce a candidate. The model might be overloaded.");
 
   for (const part of candidate.content.parts) {
     if (part.inlineData) {
@@ -67,5 +82,5 @@ export const generateMemeImage = async (imagePrompt: string): Promise<string> =>
     }
   }
 
-  throw new Error("Failed to extract image from model response.");
+  throw new Error("Failed to render the meme template visual.");
 };
