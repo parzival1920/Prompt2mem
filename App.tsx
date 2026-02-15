@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Layout, AlertCircle, ArrowRight, RotateCcw, Lightbulb } from 'lucide-react';
 import { MemeStyle, MemeData } from './types';
 import { APP_NAME, STYLE_CONFIG, PLACEHOLDERS } from './constants';
-import { generateMemeConfig, generateMemeImage } from './services/geminiService';
+import { generateMeme } from './services/geminiService';
 import LoadingSpinner from './components/LoadingSpinner';
 import MemeCard from './components/MemeCard';
 
@@ -32,20 +32,13 @@ const App: React.FC = () => {
     setMemeData(null);
 
     try {
-      // Securely calling the "backend" service
-      const config = await generateMemeConfig(prompt, selectedStyle);
-      const imageUrl = await generateMemeImage(config.imagePrompt);
-      
-      setMemeData({
-        imageUrl,
-        caption: config.caption,
-        refinedPrompt: config.imagePrompt,
-        style: selectedStyle
-      });
+      // Calling the unified secure backend endpoint
+      const result = await generateMeme(prompt, selectedStyle);
+      setMemeData(result);
       
     } catch (err: any) {
       console.error('Generation failure:', err);
-      setError(err.message || "Something went wrong. Please check your internet connection and try again.");
+      setError(err.message || "Something went wrong. Please check your connection or try again later.");
     } finally {
       setIsGenerating(false);
     }
@@ -82,7 +75,7 @@ const App: React.FC = () => {
           <span className="text-xl font-bold tracking-tight">{APP_NAME}</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="hidden md:inline-block text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full uppercase tracking-widest">Secure Production v3.0</span>
+          <span className="hidden md:inline-block text-xs font-bold text-green-500 bg-green-50 px-3 py-1 rounded-full uppercase tracking-widest border border-green-100">Secure Backend Active</span>
         </div>
       </nav>
 
@@ -96,7 +89,7 @@ const App: React.FC = () => {
                 Internet culture, <span className="text-gray-400 italic">instantly</span>.
               </h1>
               <p className="text-lg text-gray-500 max-w-md mx-auto">
-                Turn your funniest ideas into viral-ready templates with high-fidelity AI.
+                Turn your funniest ideas into viral-ready templates with secure high-fidelity AI.
               </p>
             </div>
           )}
@@ -136,7 +129,7 @@ const App: React.FC = () => {
             <div className="flex flex-wrap gap-2 justify-center animate-in fade-in duration-1000 slide-in-from-bottom-2">
               <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">
                 <Lightbulb className="w-3 h-3" />
-                Prompt Ideas:
+                Try these:
               </div>
               {suggestions.map((s, idx) => (
                 <button
@@ -205,7 +198,7 @@ const App: React.FC = () => {
                 className="px-6 py-2.5 bg-white border border-gray-200 hover:border-black hover:bg-black hover:text-white rounded-full text-xs font-bold uppercase tracking-widest text-gray-500 transition-all flex items-center gap-2 shadow-md"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                New Concept
+                Start Over
               </button>
             </div>
           )}
@@ -213,7 +206,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="py-8 text-gray-300 text-[10px] font-bold uppercase tracking-[0.4em]">
-        Secured by Gemini Infrastructure &bull; {new Date().getFullYear()}
+        Server-side Security Enabled &bull; {new Date().getFullYear()}
       </footer>
     </div>
   );
